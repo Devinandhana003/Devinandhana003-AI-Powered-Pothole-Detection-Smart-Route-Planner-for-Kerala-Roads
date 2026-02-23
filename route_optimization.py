@@ -33,3 +33,27 @@ dest_node = ox.distance.nearest_nodes(G, dest_lon, dest_lat)
 route = nx.shortest_path(G, source_node, dest_node, weight="length")
 print("Safest route calculated!")
 print("Route contains", len(route), "nodes.")
+
+G_original = ox.graph_from_place(place_name, network_type="drive")
+ 
+source_node_original = ox.distance.nearest_nodes(G_original, source_lon, source_lat)
+dest_node_original = ox.distance.nearest_nodes(G_original, dest_lon, dest_lat)
+ 
+shortest_route = nx.shortest_path(G_original, source_node_original, dest_node_original, weight="length")
+ 
+print("Normal shortest route calculated!")
+print("Shortest route contains", len(shortest_route), "nodes.")
+
+def calculate_route_length(G, route):
+    length = 0
+    for i in range(len(route) - 1):
+        edge_data = G.get_edge_data(route[i], route[i+1])[0]
+        length += edge_data["length"]
+    return length
+ 
+shortest_length = calculate_route_length(G_original, shortest_route)
+safest_length = calculate_route_length(G, route)
+ 
+print("\n--- Route Comparison ---")
+print("Shortest Route Distance:", round(shortest_length/1000, 2), "km")
+print("Safest Route Distance:", round(safest_length/1000, 2), "km")
