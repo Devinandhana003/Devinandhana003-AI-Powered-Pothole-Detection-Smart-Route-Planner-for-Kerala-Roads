@@ -3,6 +3,7 @@ Real-time pothole detection on Kerala roads using computer vision + intelligent 
 
 
 **Architecture**
+
 User (Browser)
 
         ↓
