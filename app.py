@@ -9,12 +9,10 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    source_lat = float(request.form['source_lat'])
-    source_lon = float(request.form['source_lon'])
-    dest_lat = float(request.form['dest_lat'])
-    dest_lon = float(request.form['dest_lon'])
+    source = request.form['source']
+    destination = request.form['destination']
 
-    result = generate_route(source_lat, source_lon, dest_lat, dest_lon)
+result = generate_route(source, destination)
 
     return render_template(
         "index.html",
@@ -25,4 +23,5 @@ def generate():
     )
 
 if __name__ == '__main__':
+
     app.run(debug=True)
