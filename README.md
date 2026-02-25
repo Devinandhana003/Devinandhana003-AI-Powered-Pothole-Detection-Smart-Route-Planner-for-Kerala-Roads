@@ -4,13 +4,19 @@ Real-time pothole detection on Kerala roads using computer vision + intelligent 
 
 **Architecture**
 User (Browser)
+
         ↓
 Flask Web Interface
+
         ↓
 YOLO Detection Module
+
         ↓
 Severity & Risk Engine
+
         ↓
 Graph Routing Engine
+
         ↓
 Map + Risk Comparison Output
+
