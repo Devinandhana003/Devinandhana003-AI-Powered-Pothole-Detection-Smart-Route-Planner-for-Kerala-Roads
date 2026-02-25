@@ -7,10 +7,8 @@
     <h2>SafeRoute AI - Pothole Aware Navigation</h2>
 
     <form action="/generate" method="POST">
-        <input type="text" name="source_lat" placeholder="Source Latitude" required>
-        <input type="text" name="source_lon" placeholder="Source Longitude" required>
-        <input type="text" name="dest_lat" placeholder="Destination Latitude" required>
-        <input type="text" name="dest_lon" placeholder="Destination Longitude" required>
+        <input type="text" name="source" placeholder="Enter source location" required>
+        <input type="text" name="destination" placeholder="Enter destination location" required>
         <button type="submit">Generate Safest Route</button>
     </form>
 
@@ -23,4 +21,5 @@
     {% endif %}
 
 </body>
+
 </html>
