@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SafeRoute AI</title>
+</head>
+<body>
+    <h2>SafeRoute AI - Pothole Aware Navigation</h2>
+
+    <form action="/generate" method="POST">
+        <input type="text" name="source_lat" placeholder="Source Latitude" required>
+        <input type="text" name="source_lon" placeholder="Source Longitude" required>
+        <input type="text" name="dest_lat" placeholder="Destination Latitude" required>
+        <input type="text" name="dest_lon" placeholder="Destination Longitude" required>
+        <button type="submit">Generate Safest Route</button>
+    </form>
+
+    {% if shortest_risk %}
+        <h3>Results</h3>
+        <p>Shortest Route Risk: {{ shortest_risk }}</p>
+        <p>Safest Route Risk: {{ safest_risk }}</p>
+
+        <iframe src="{{ map_file }}" width="100%" height="500"></iframe>
+    {% endif %}
+
+</body>
+</html>
