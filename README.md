@@ -1,6 +1,3 @@
-AI-Powered-Pothole-Detection-Smart-Route-Planner-for-Kerala-Roads
-Real-time pothole detection on Kerala roads using computer vision + intelligent route optimization avoiding hazardous paths.
+# AI-POTHOL-Detection
 
-
-dataset:
-https://drive.google.com/file/d/147OQZnI-zmidawyFjjy8BdhR9nxZj4MR/view?usp=drive_link
+[![Open in Bolt](https://bolt.new/static/open-in-bolt.svg)](https://bolt.new/~/sb1-bwmqveja)
