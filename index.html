@@ -4,20 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RoadEase Route Advisor</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#home" aria-label="RoadEase home">
+    <a class="brand" href="#home">
       <span class="brand-mark">R</span>
       <span>RoadEase</span>
     </a>
-    <nav class="nav-links" aria-label="Main navigation">
+    <nav class="nav-links">
       <a href="#routes">Routes</a>
-      <a href="#updates">Updates</a>
       <a href="#report">Report</a>
     </nav>
     <a class="nav-action" href="#routes">Check route</a>
@@ -27,25 +23,32 @@
     <section class="hero" id="home">
       <div class="hero-copy">
         <p class="eyebrow">Local pothole-aware route guidance</p>
-        <h1>Reach the same destination by the road with fewer potholes.</h1>
+        <h1>Choose the route with fewer potholes.</h1>
         <p class="hero-text">
-          Compare the nearby routes you already know, see current pothole reports,
-          and help everyone by marking whether each pothole is still there or cleared.
+          Compare the normal shortest route with a safer route from
+          Kunnumpuram Junction, Edappally North to Lulu Mall, Edappally.
         </p>
         <div class="hero-actions">
-          <a class="primary-btn" href="#routes">View suggested routes</a>
-          <a class="secondary-btn" href="#report">Update pothole status</a>
+          <a class="primary-btn" href="#routes">Generate route</a>
+          <a class="secondary-btn" href="#report">Report pothole</a>
         </div>
       </div>
 
-      <div class="phone-preview" aria-label="Route preview">
+      <div class="phone-preview">
         <div class="phone-status">
-          <span>Today</span>
-          <strong>Best: Lake Road</strong>
+          <span>Current route</span>
+          <strong>
+            {% if source and destination %}
+              {{ source }} to {{ destination }}
+            {% else %}
+              Kunnumpuram to Lulu Mall
+            {% endif %}
+          </strong>
         </div>
+
         <div class="mini-map">
           <span class="pin start">Start</span>
-          <span class="pin end">College</span>
+          <span class="pin end">End</span>
           <span class="road road-a"></span>
           <span class="road road-b"></span>
           <span class="road road-c"></span>
@@ -53,9 +56,22 @@
           <span class="hole h2"></span>
           <span class="hole h3"></span>
         </div>
+
         <div class="phone-card">
-          <span class="safe-score">82% smoother</span>
-          <span>2 active potholes</span>
+          <span class="safe-score">
+            {% if reduction is defined %}
+              {{ reduction }}% lower risk
+            {% else %}
+              Ready to compare
+            {% endif %}
+          </span>
+          <span>
+            {% if safest_risk is defined %}
+              Risk score {{ safest_risk }}
+            {% else %}
+              Community pothole data
+            {% endif %}
+          </span>
         </div>
       </div>
     </section>
@@ -63,126 +79,129 @@
     <section class="route-panel" id="routes">
       <div class="section-heading">
         <p class="eyebrow">Route suggestions</p>
-        <h2>One start. One destination. Smarter road choices.</h2>
+        <h2>Check the safest route for your fixed path.</h2>
       </div>
 
       <div class="route-grid">
-        <aside class="route-controls" aria-label="Route details">
+        <form class="route-controls" action="/generate" method="POST">
           <label>
             Start point
-            <input type="text" value="Near Bus Stand" aria-label="Start point">
+            <input
+              type="text"
+              name="source"
+              value="{{ source or 'Kunnumpuram Junction, Edappally North' }}"
+              required
+            >
           </label>
+
           <label>
             Destination
-            <input type="text" value="City College Gate" aria-label="Destination">
+            <input
+              type="text"
+              name="destination"
+              value="{{ destination or 'Lulu Mall, Edappally' }}"
+              required
+            >
           </label>
 
-          <div class="legend">
-            <span><i class="dot safe"></i> Recommended</span>
-            <span><i class="dot caution"></i> Moderate potholes</span>
-            <span><i class="dot risky"></i> Avoid if possible</span>
-          </div>
-        </aside>
+          <button type="submit">Find safest route</button>
 
-        <div class="routes-list" aria-live="polite">
-          <article class="route-card selected" data-route="lake">
-            <div>
-              <h3>Lake Road</h3>
-              <p>7.2 km | 18 min | 2 active potholes</p>
-            </div>
-            <span class="badge">Recommended</span>
-          </article>
-          <article class="route-card" data-route="market">
-            <div>
-              <h3>Market Street</h3>
-              <p>6.5 km | 16 min | 6 active potholes</p>
-            </div>
-            <span class="badge warning">Faster</span>
-          </article>
-          <article class="route-card" data-route="temple">
-            <div>
-              <h3>Temple Bypass</h3>
-              <p>8.1 km | 22 min | 1 active pothole</p>
-            </div>
-            <span class="badge calm">Smoothest</span>
-          </article>
+          <div class="legend">
+            <span><i class="dot safe"></i> Safer pothole-aware route</span>
+            <span><i class="dot risky"></i> Normal shortest route</span>
+          </div>
+        </form>
+
+        <div class="routes-list">
+          {% if shortest_risk is defined %}
+            <article class="route-card">
+              <div>
+                <h3>Normal shortest route</h3>
+                <p>Risk score: {{ shortest_risk }}</p>
+              </div>
+              <span class="badge warning">Shortest</span>
+            </article>
+
+            <article class="route-card selected">
+              <div>
+                <h3>Pothole-aware safer route</h3>
+                <p>Risk score: {{ safest_risk }} | {{ reduction }}% lower risk</p>
+              </div>
+              <span class="badge">Suggested</span>
+            </article>
+          {% else %}
+            <article class="route-card selected">
+              <div>
+                <h3>No route generated yet</h3>
+                <p>Click the button to compare route safety.</p>
+              </div>
+              <span class="badge">Waiting</span>
+            </article>
+          {% endif %}
         </div>
       </div>
-    </section>
 
-    <section class="updates" id="updates">
-      <div class="section-heading">
-        <p class="eyebrow">Live community updates</p>
-        <h2>Keep route results accurate.</h2>
-      </div>
-      <div class="update-list">
-        <article class="update-item">
-          <span class="status-dot open"></span>
-          <div>
-            <h3>Near tea shop corner</h3>
-            <p>Still there | reported 24 minutes ago</p>
-          </div>
-          <button type="button" data-status="Cleared">Mark cleared</button>
-        </article>
-        <article class="update-item">
-          <span class="status-dot cleared"></span>
-          <div>
-            <h3>Bridge entrance</h3>
-            <p>Cleared | confirmed yesterday</p>
-          </div>
-          <button type="button" data-status="Still there">Still there?</button>
-        </article>
-        <article class="update-item">
-          <span class="status-dot open"></span>
-          <div>
-            <h3>Opposite petrol pump</h3>
-            <p>Still there | 3 user confirmations</p>
-          </div>
-          <button type="button" data-status="Cleared">Mark cleared</button>
-        </article>
-      </div>
+      {% if map_file %}
+        <div class="map-section">
+          <h3>Route map</h3>
+          <iframe
+            title="Generated route map"
+            src="{{ url_for('static', filename=map_file) }}">
+          </iframe>
+        </div>
+      {% endif %}
     </section>
 
     <section class="report" id="report">
       <div class="report-copy">
-        <p class="eyebrow">Simple reporting</p>
-        <h2>Update a pothole in seconds.</h2>
+        <p class="eyebrow">Pothole updates</p>
+        <h2>Upload a road photo and update pothole status.</h2>
         <p>
-          The form can later connect to your backend. For now, it shows the exact
-          front-end flow users need: choose location, choose status, and submit.
+          Users can report if a pothole is still there, cleared, or worse than before.
         </p>
       </div>
-      <form class="report-form">
+
+      <form class="report-form" action="/report" method="POST" enctype="multipart/form-data">
         <label>
           Pothole location
-          <input type="text" placeholder="Example: Lake Road, near bakery">
+          <input
+            type="text"
+            name="location"
+            placeholder="Example: near Edappally signal"
+            required
+          >
         </label>
+
         <label>
           Current status
-          <select>
+          <select name="status">
             <option>Still there</option>
             <option>Cleared</option>
             <option>Worse than before</option>
           </select>
         </label>
+
         <label>
           Road photo
-          <input class="photo-input" type="file" accept="image/*">
+          <input class="photo-input" type="file" name="photo" accept="image/*">
         </label>
-        <div class="photo-preview" aria-live="polite">
+
+        <div class="photo-preview">
           <span>No photo selected</span>
           <img alt="Selected road photo preview">
         </div>
+
         <label>
           Optional note
-          <textarea rows="4" placeholder="Add a short detail"></textarea>
+          <textarea name="note" rows="4" placeholder="Add a short detail"></textarea>
         </label>
+
         <button type="submit">Submit update</button>
-        <p class="form-message" role="status"></p>
+        <p class="form-message">{{ report_message or '' }}</p>
       </form>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
