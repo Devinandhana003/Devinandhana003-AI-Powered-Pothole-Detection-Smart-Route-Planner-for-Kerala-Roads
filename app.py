@@ -12,7 +12,7 @@ def generate():
     source = request.form['source']
     destination = request.form['destination']
 
-result = generate_route(source, destination)
+    result = generate_route(source, destination)
 
     return render_template(
         "index.html",
@@ -23,5 +23,4 @@ result = generate_route(source, destination)
     )
 
 if __name__ == '__main__':
-
     app.run(debug=True)
