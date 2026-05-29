@@ -1,0 +1,15 @@
+project/
+  app.py
+  route_optimization.py
+  extract_potholes.py
+  route_optimization.py
+  pothole_data.csv
+  requirements.txt
+
+  templates/
+    index.html
+
+  static/
+    styles.css
+    app.js
+THIS IS HOW I SAVED FILES 
